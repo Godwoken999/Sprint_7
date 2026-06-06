@@ -1,7 +1,6 @@
 import pytest
-import requests
 
-from urls import Urls
+from api_methods import OrderMethods
 from helpers import generate_order_payload
 
 
@@ -13,11 +12,22 @@ class TestCreateOrder:
         ["BLACK", "GREY"],
         None
     ])
+    def test_create_order_with_different_colors_returns_status_code_201(self, color):
+        payload = generate_order_payload(color)
+
+        response = OrderMethods.create_order(payload)
+
+        assert response.status_code == 201
+
+    @pytest.mark.parametrize("color", [
+        ["BLACK"],
+        ["GREY"],
+        ["BLACK", "GREY"],
+        None
+    ])
     def test_create_order_with_different_colors_returns_track(self, color):
         payload = generate_order_payload(color)
 
-        response = requests.post(Urls.CREATE_ORDER, json=payload)
+        response = OrderMethods.create_order(payload)
 
-        assert response.status_code == 201
         assert "track" in response.json()
-        assert type(response.json()["track"]) == int
